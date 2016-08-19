@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:event listener="#{cidadeMB.carrega()}" type="preRenderView" />
+
+	</ui:define>
+	<ui:define name="conteudo">
+
+		<h:form id="formTabela">
+			<!-- cabeçalho da pagina  -->
+			<p:toolbar>
+				<f:facet name="left">
+					<h:outputText value="Cidades" />
+				</f:facet>
+			</p:toolbar>
+
+			<!-- tabela  -->
+			<p:dataTable emptyMessage="Nenhum registro Encontrado"
+				value="#{cidadeMB.listaCidade}" var="cidadeL" rows="9"
+				paginator="true" id="tabelaExib" widgetVar="tabelaCidade"
+				reflow="true">
+				<p:column headerText="Código">
+					<h:outputText value="#{cidadeL.id}" />
+				</p:column>
+
+				<p:column headerText="Cidade">
+					<h:outputText value="#{cidadeL.nome}" />
+				</p:column>
+
+				<p:column headerText="Estado">
+					<h:outputText value="#{cidadeL.estado.nome}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash"
+						update=":frmExcluirCidade:pnlExcluirCidade"
+						oncomplete="PF('dlgExcluirCidade').show();">
+						<f:setPropertyActionListener value="#{cidadeL}"
+							target="#{cidadeMB.objCidade}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil"
+						update="frmEditarCidade:pnlEditarCidade"
+						oncomplete="PF('dlgEditarCidade').show();">
+						<f:setPropertyActionListener value="#{cidadeL}"
+							target="#{cidadeMB.objCidade}" />
+
+					</p:commandButton>
+
+
+				</p:column>
+
+				<f:facet name="footer">
+					<!-- se ficar buscando os dados sem querer coloque um update no formulario e msg -->
+					<p:commandButton value="Novo"
+						actionListener="#{cidadeMB.criarNovoObjetoCidade()}"
+						oncomplete="PF('dlgCidadeNovo').show();"
+						update=":msgGlobal frmCidadeNovo:pnlCidadeNovo" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+
+		<!--  formulario cadastrar cidade -->
+
+		<p:dialog widgetVar="dlgCidadeNovo" closable="false" draggable="false"
+			resizable="false" header="Cadastro de Cidade" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmCidadeNovo">
+
+				<p:growl id="msgs" showDetail="true" />
+
+
+				<h:panelGrid id="pnlCidadeNovo" columns="2">
+
+					<p:outputLabel for="txtcod" value="Cidade" />
+					<h:inputText id="txtcod" size="30" maxlength="50"
+						value="#{cidadeMB.objCidade.nome}" rendered="true" />
+
+
+
+
+					<p:outputLabel value="Estado" />
+					<p:selectOneMenu value="#{cidadeMB.objCidade.estado}"
+						converter="estadoConverter" filter="true" required="true">
+
+						<f:selectItem itemValue="" itemLabel="Selecione um Estado" />
+
+						<f:selectItems value="#{cidadeMB.listaEstado}" var="estado"
+							itemValue="#{estado}" itemLabel="#{estado.nome}" />
+
+					</p:selectOneMenu>
+
+					<p:outputLabel value="Estado" />
+					<p:autoComplete dropdown="true"
+						value="#{cidadeMB.objCidade.estado}" scrollHeight="170"
+						completeMethod="#{cidadeMB.completeText}" forceSelection="true"
+						converter="estadoConverter" var="est" itemLabel="#{est.nome}"
+						itemValue="#{est}">
+
+					</p:autoComplete>
+
+					<p:outputLabel value="Estado" />
+					<p:selectManyMenu value="#{cidadeMB.estadoSelecionado}"
+						converter="estadoConverter" var="e" filter="true"
+						filterMatchMode="contains" showCheckbox="true" scrollHeight="100">
+						<f:selectItems value="#{cidadeMB.listaEstado}" var="estado"
+							itemValue="#{estado}" itemLabel="#{estado.nome}" />
+						<p:column>
+							<h:outputText styleClass="ui-theme ui-theme-#{e.nome}" />
+						</p:column>
+						<p:column>
+							<h:outputText value="#{e.nome}" />
+						</p:column>
+
+
+					</p:selectManyMenu>
+
+					<!-- auto complete p: -->
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Salvar"
+						actionListener="#{cidadeMB.inserirCidade()}"
+						update=":msgGlobal :formTabela:tabelaExib"
+						oncomplete="verificar(xhr, status, args, 'dlgCidadeNovo', 'tabelaCidade');" />
+
+					<!--process="" ele faz submição a parte (process="@this" diz q só este botao sera enviado para a submição)-->
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgCidadeNovo').hide();" />
+
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+		<!-- editar -->
+
+		<p:dialog widgetVar="dlgEditarCidade" closable="false"
+			draggable="false" resizable="false" header="Editar de Cidade"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmEditarCidade">
+
+				<h:panelGrid id="pnlEditarCidade" columns="2">
+					<p:outputLabel value="Código" />
+					<h:inputText size="30" maxlength="50"
+						value="#{cidadeMB.objCidade.id}" required="true"
+						requiredMessage="Digite o valor do campo" />
+
+
+					<p:outputLabel value="Cidade" />
+					<h:inputText size="30" maxlength="50"
+						value="#{cidadeMB.objCidade.nome}" required="true"
+						requiredMessage="Digite o valor do campo" />
+
+					<p:outputLabel value="Estado" />
+					<p:selectOneMenu value="#{cidadeMB.objCidade.estado}"
+						converter="estadoConverter" filter="true" required="true"
+						requiredMessage="Digite o valor do campo">
+
+						<f:selectItem itemValue="" itemLabel="Selecione um Estado" />
+
+						<f:selectItems value="#{cidadeMB.listaEstado}" var="estado"
+							itemValue="#{estado}" itemLabel="#{estado.nome}" />
+
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="4">
+
+
+					<p:commandButton value="Salvar"
+						actionListener="#{cidadeMB.editarCidade()}"
+						update=":msgGlobal :formTabela:tabelaExib"
+						oncomplete="verificar(xhr, status, args, 'dlgEditarCidade', 'tabelaCidade');" />
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgEditarCidade').hide();" />
+					<!--  oncomplete="PF('dlgFabNovo').hide(); tabelaFabricante.clearFilters();"-->
+
+
+
+
+
+				</h:panelGrid>
+			</h:form>
+
+
+
+			<!--  formulario excluir cidade -->
+
+			<p:dialog widgetVar="dlgExcluirCidade" closable="false"
+				draggable="false" resizable="false" header="Excluir Cidade"
+				modal="true" appendTo="@(body)">
+
+				<h:form id="frmExcluirCidade">
+
+					<h:panelGrid id="pnlExcluirCidade" columns="2">
+						<p:outputLabel value="Código" />
+						<h:inputText size="30" maxlength="50"
+							value="#{cidadeMB.objCidade.id}" readonly="true" />
+
+						<p:outputLabel value="Cidade" />
+						<h:inputText size="30" maxlength="50"
+							value="#{cidadeMB.objCidade.nome}" readonly="true" />
+
+
+					</h:panelGrid>
+
+					<h:panelGrid columns="3">
+
+						<p:commandButton value="Excluir"
+							actionListener="#{cidadeMB.excluirCidade()}"
+							oncomplete="PF('dlgExcluirCidade').hide();"
+							update=":msgGlobal :formTabela:tabelaExib" />
+
+						<p:commandButton value="Cancelar" process="@this"
+							onclick="PF('dlgExcluirCidade').hide();">
+
+						</p:commandButton>
+						<!--  oncomplete="PF('dlgFabNovo').hide(); tabelaFabricante.clearFilters();"-->
+
+					</h:panelGrid>
+				</h:form>
+
+			</p:dialog>
+
+		</p:dialog>
+
+
+
+
+
+
+	</ui:define>
+</ui:composition>
+
+</html>

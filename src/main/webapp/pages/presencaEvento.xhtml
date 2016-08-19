@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+
+	<ui:define name="metadata">
+
+		<f:event listener="#{inscreverEventoMB.carrega()}"
+			type="preRenderView" />
+
+	</ui:define>
+	<ui:define name="conteudo">
+
+		<h:form id="formLista">
+			<!-- cabeçalho da pagina  -->
+			<p:toolbar>
+				<f:facet name="left">
+					<h:outputText value="Eventos" />
+				</f:facet>
+			</p:toolbar>
+
+			<!-- tabela  -->
+			<p:dataTable emptyMessage="Nenhum registro Encontrado"
+				value="#{inscreverEventoMB.listaInscEvento}" var="list" rows="6"
+				paginator="true" id="tabelaLista">
+				<p:column headerText="Código">
+					<h:outputText value="#{list.id}" />
+				</p:column>
+
+				<p:column headerText="Aluno">
+					<h:outputText value="#{list.aluno.nome}" />
+				</p:column>
+
+				<p:column headerText="Evento">
+					<h:outputText value="#{list.evento.descricao}" />
+				</p:column>
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" oncomplete="PF('dlgExcluirPresenca').show();"
+						update=":frmAlterarAluno:pnlAlterarAluno">
+						<f:setPropertyActionListener value="#{list}"
+							target="#{inscreverEventoMB.objInscEvento}" />
+					
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" 
+						oncomplete="PF('dlgEditarPresenca').show();"
+						update=":frmExcluirPresenca:pnlExcluirPresenca">
+						<f:setPropertyActionListener value="#{list}"
+							target="#{inscreverEventoMB.objInscEvento}" />
+
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<!-- se ficar buscando os dados sem querer coloque um update no formulario e msg -->
+					<p:commandButton value="Novo"
+						actionListener="#{inscreverEventoMB.criarNovoObjetoEstado()}"
+						oncomplete="PF('dlgNovaPresenca').show();"
+						update=":frmNovoAluno:pnlNovoAluno" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+
+		<!--  formulario cadastrar Aluno -->
+
+		<p:dialog widgetVar="dlgNovaPresenca" closable="false"
+			draggable="false" resizable="false" header="Cadastrar em um Evento"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmNovoAluno">
+
+				<h:panelGrid id="pnlNovoAluno" columns="2">
+
+					<p:outputLabel value="Aluno" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.aluno}"
+						converter="alunoConverter" filter="true">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Aluno" />
+						<f:selectItems value="#{inscreverEventoMB.listaAluno}" var="aluno"
+							itemValue="#{aluno}" itemLabel="#{aluno.nome}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="Evento" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.evento}"
+						converter="eventoConverter" filter="true">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Evento" />
+						<f:selectItems value="#{inscreverEventoMB.listaEventos}"
+							var="evento" itemValue="#{evento}"
+							itemLabel="#{evento.descricao}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Salvar"
+						actionListener="#{inscreverEventoMB.inserirPresencaEvento()}"
+						update=":msgGlobal :formLista:tabelaLista "
+						oncomplete="PF('dlgNovaPresenca').hide();" />
+
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgNovaPresenca').hide();">
+
+					</p:commandButton>
+
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+
+
+		<!--  formulario Alterar Aluno -->
+
+		<p:dialog widgetVar="dlgEditarPresenca" closable="false"
+			draggable="false" resizable="false" header="Alterar Presença Evento"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmAlterarAluno">
+
+				<h:panelGrid id="pnlAlterarAluno" columns="2">
+
+					<p:outputLabel value="Aluno" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.aluno}"
+						converter="alunoConverter" filter="true">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Aluno" />
+						<f:selectItems value="#{inscreverEventoMB.listaAluno}" var="aluno"
+							itemValue="#{aluno}" itemLabel="#{aluno.nome}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="Evento" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.evento}"
+						converter="eventoConverter" filter="true">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Evento" />
+						<f:selectItems value="#{inscreverEventoMB.listaEventos}"
+							var="evento" itemValue="#{evento}"
+							itemLabel="#{evento.descricao}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Editar"
+						actionListener="#{inscreverEventoMB.alterarPresencaEvento()}"
+						update=":msgGlobal :formLista:tabelaLista "
+						oncomplete="PF('dlgEditarPresenca').hide();" />
+
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgEditarPresenca').hide();">
+
+					</p:commandButton>
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+		
+		
+		
+		<!--  formulario Excluir Aluno -->
+
+		<p:dialog widgetVar="dlgExcluirPresenca" closable="false"
+			draggable="false" resizable="false" header="Excluir Presença Evento"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmExcluirPresenca">
+
+				<h:panelGrid id="pnlExcluirPresenca" columns="2">
+
+					<p:outputLabel value="Aluno" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.aluno}"
+						converter="alunoConverter">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Aluno" />
+						<f:selectItems value="#{inscreverEventoMB.listaAluno}" var="aluno"
+							itemValue="#{aluno}" itemLabel="#{aluno.nome}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+
+					<p:outputLabel value="Evento" />
+					<p:selectOneMenu value="#{inscreverEventoMB.objInscEvento.evento}"
+						converter="eventoConverter">
+
+
+						<f:selectItem itemValue="" itemLabel="Selecione Um Evento" />
+						<f:selectItems value="#{inscreverEventoMB.listaEventos}"
+							var="evento" itemValue="#{evento}"
+							itemLabel="#{evento.descricao}" />
+
+						<f:selectItems />
+					</p:selectOneMenu>
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Editar"
+						actionListener="#{inscreverEventoMB.excluirPresencaEvento()}"
+						update=":msgGlobal :formLista:tabelaLista "
+						oncomplete="PF('dlgExcluirPresenca').hide();" />
+
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgEditarPresenca').hide();">
+
+					</p:commandButton>
+
+				</h:panelGrid>
+			</h:form>
+		</p:dialog>
+		
+	</ui:define>
+</ui:composition>
+
+</html>

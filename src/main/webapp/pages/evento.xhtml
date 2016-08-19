@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+
+	<ui:define name="metadata">
+		<!-- 	<f:event listener="#{cidadeMB.carrega()}" type="preRenderView" />  -->
+		<f:event listener="#{eventoMB.carrega()}" type="preRenderView" />
+	</ui:define>
+	<ui:define name="conteudo">
+
+		<h:form id="formTabela">
+			<!-- cabeçalho da pagina  -->
+			<p:toolbar>
+				<f:facet name="left">
+					<h:outputText value="Eventos" />
+				</f:facet>
+			</p:toolbar>
+
+			<!-- tabela  -->
+			<p:dataTable id="dtTabela" emptyMessage="Nenhum registro Encontrado"
+				value="#{eventoMB.listaEvento}" var="listEvento" widgetVar="tabelaNovoEvento">
+				<p:column headerText="Código">
+					<h:outputText value="#{listEvento.id}" />
+				</p:column>
+
+				<p:column headerText="Descrição">
+					<h:outputText value="#{listEvento.descricao}" />
+				</p:column>
+
+				<p:column headerText="Local">
+					<h:outputText value="#{listEvento.local}" />
+				</p:column>
+
+				<p:column headerText="Data">
+					<h:outputText value="#{listEvento.data}" />
+				</p:column>
+
+				<p:column headerText="Horario">
+					<h:outputText value="#{listEvento.hora}" />
+				</p:column>
+
+
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" onclick="PF('dlgExcluirEvento').show();" update=" :frmExcluirEvento:pnlExcluirEvento">
+						 <f:setPropertyActionListener target="#{eventoMB.objEvento}" value="#{listEvento}"/>
+						 
+						
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" onclick="PF('dlgEditarEvento').show();" update=":msgGlobal :frmEditarEvento:pnlEditarEvento">
+					    <f:setPropertyActionListener value="#{listEvento}"
+							target="#{eventoMB.objEvento}" />
+
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<!-- se ficar buscando os dados sem querer coloque um update no formulario e msg -->
+					<p:commandButton value="Novo" actionListener="#{eventoMB.criarNovoEvento()}" update=":msgGlobal :frmNovoEvento:pnlNovoAluno"
+						oncomplete="PF('dlgNovoEvento').show();" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+
+		<!--  formulario cadastrar Evento -->
+
+		<p:dialog widgetVar="dlgNovoEvento" closable="false" draggable="false"
+			resizable="false" header="Cadastro de Eventos" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmNovoEvento">
+
+				<h:panelGrid id="pnlNovoAluno" columns="2">
+
+					<p:outputLabel value="Descrição" />
+					<h:inputText size="30" maxlength="50"
+						value="#{eventoMB.objEvento.descricao}"  required="true" requiredMessage="Digite o valor do campo Descrição"/>
+
+					<p:outputLabel value="Local" />
+					<h:inputText size="30" maxlength="50"
+						value="#{eventoMB.objEvento.local}"  required="true" requiredMessage="Digite o valor do campo Local"/>
+
+					
+
+					<p:outputLabel value="Horario" />
+					<p:inputMask mask="99:99" size="30" maxlength="50"
+						value="#{eventoMB.objEvento.hora}"  required="true" requiredMessage="Digite o valor do campo Horario"/>
+
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Salvar"
+						actionListener="#{eventoMB.inserirEvento()}"
+						update=":msgGlobal :formTabela:dtTabela"
+					 oncomplete="verificar(xhr, status, args, 'dlgNovoEvento', 'tabelaNovoEvento');"/>
+
+
+					<p:commandButton value="Cancelar"
+						onclick="PF('dlgNovoEvento').hide();">
+
+					</p:commandButton>
+
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+
+
+
+
+		<!-- editar -->
+
+		<p:dialog widgetVar="dlgEditarEvento" closable="false"
+			draggable="false" resizable="false" header="Editar Evento"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmEditarEvento">
+
+				<h:panelGrid id="pnlEditarEvento" columns="2">
+					<p:outputLabel value="Código" />
+					<h:inputText size="30" maxlength="50" readonly="false" value="#{eventoMB.objEvento.id}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+
+					<p:outputLabel value="Descrição" />
+					<h:inputText size="30" maxlength="50" value="#{eventoMB.objEvento.descricao}"  required="true" requiredMessage="Digite o valor do campo"/>
+					
+					
+					<p:outputLabel value="Local" />
+					<h:inputText size="30" maxlength="50" value="#{eventoMB.objEvento.local}" required="true" requiredMessage="Digite o valor do campo"/>
+					
+				
+					<p:outputLabel value="Horario" />
+					<h:inputText size="30" maxlength="50" value="#{eventoMB.objEvento.hora}" required="true" requiredMessage="Digite o valor do campo"/>
+
+				</h:panelGrid>
+				<h:panelGrid columns="3">
+
+
+					<p:commandButton value="Editar" actionListener="#{eventoMB.alterarEvento()}" update=":msgGlobal :formTabela:dtTabela"
+					oncomplete="verificar(xhr, status, args, 'dlgEditarEvento', 'tabelaNovoEvento');"/>
+				
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgEditarEvento').hide();" />
+				
+
+
+
+
+				</h:panelGrid>
+
+			</h:form>
+
+		</p:dialog>
+
+
+		<!--  formulario excluir cidade -->
+
+		<p:dialog widgetVar="dlgExcluirEvento" closable="false"
+			draggable="false" resizable="false" header="Excluir Cidade"
+			modal="true" appendTo="@(body)">
+
+			<h:form id="frmExcluirEvento">
+
+				<h:panelGrid id="pnlExcluirEvento" columns="2">
+					<p:outputLabel value="Código" />
+					<h:inputText size="30" maxlength="50" value="#{eventoMB.objEvento.id}" readonly="true"/>
+
+					<p:outputLabel value="Descrição" />
+					<h:inputText size="30" maxlength="50" value="#{eventoMB.objEvento.descricao}" readonly="true"/>
+
+
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Excluir" actionListener="#{eventoMB.excluirEvento()}" update=":msgGlobal :formTabela:dtTabela"
+					oncomplete="PF('dlgExcluirEvento').hide();"/>
+					<!--process="" ele faz submição a parte (process="@this" diz q só este botao sera enviado para a submição)-->
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgExcluirEvento').hide();">
+
+					</p:commandButton>
+					<!--  oncomplete="PF('dlgFabNovo').hide(); tabelaFabricante.clearFilters();"-->
+
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+
+
+	</ui:define>
+</ui:composition>
+
+</html>

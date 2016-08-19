@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+	<ui:define name="metadata">
+		<f:metadata>
+			<!--   erro deve estar na hr de pegar, pq estou armazenando em uma lista e aqui não estou pegando da lista  -->
+
+			<f:event listener="#{estaboMB.carregarCadastro()}"
+				type="preRenderView" />
+		</f:metadata>
+	</ui:define>
+	<ui:define name="conteudo">
+
+		<h:form id="frmCadastroCidade">
+			<h:panelGrid columns="2" id="pnlCadastroCidade">
+
+				<p:outputLabel value="Código" />
+				<p:inputText maxLength="20" size="30"
+					value="#{estaboMB.objEstado.id}" readonly="true"/>
+
+				<p:outputLabel value="Nome" />
+				<p:inputText maxLength="20" size="30"
+					value="#{estaboMB.objEstado.nome}" />
+
+				<p:outputLabel value="Sigla" />
+				<p:inputText maxLength="20" size="30"
+					value="#{estaboMB.objEstado.sigla}" >
+					<f:validateBean />	
+					
+				</p:inputText>
+
+			</h:panelGrid>
+
+			<h:panelGrid columns="5">
+				<p:commandButton value="Novo"
+					actionListener="#{estaboMB.criarNovoObjetoEstado()}"
+					update=":frmCadastroCidade:pnlCadastroCidade" />
+					
+				<p:commandButton value="Salvar"
+					actionListener="#{estaboMB.inserirEstado()}" update=":msgGlobal"
+					action="/pages/estadoPesquisa.xhtml?faces-redirect=true" />
+					
+				<p:commandButton value="Excluir"
+					actionListener="#{estaboMB.removerEstado()}" update=":msgGlobal" 
+					action="/pages/estadoPesquisa.xhtml?faces-redirect=true" />
+					
+				<p:commandButton value="Editar"
+					actionListener="#{estaboMB.alterar()}"
+					action="/pages/estadoPesquisa.xhtml?faces-redirect=true"
+					update=":msgGlobal" />
+					
+				<p:commandButton value="Voltar"
+					action="/pages/estadoPesquisa.xhtml?faces-redirect=true" />
+
+			</h:panelGrid>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>
+
+</html>

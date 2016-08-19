@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+
+	<ui:define name="metadata">
+		<f:event listener="#{alunoMB.carrega()}" type="preRenderView" />
+	</ui:define>
+	<ui:define name="conteudo">
+
+		<h:form id="formLista">
+			<!-- cabeçalho da pagina  -->
+			<p:toolbar>
+				<f:facet name="left">
+					<h:outputText value="Aluno" />
+				</f:facet>
+			</p:toolbar>
+
+			<!-- tabela  -->
+			<p:dataTable id="tabelaLista" emptyMessage="Nenhum registro Encontrado" value="#{alunoMB.listaAluno}" var="list">
+				<p:column headerText="Código" width="tabelaListar">
+					<h:outputText value="#{list.id}" />
+				</p:column>
+
+				<p:column headerText="Nome">
+					<h:outputText value="#{list.nome}" />
+
+				</p:column>
+
+				<p:column headerText="Cidade">
+					<h:outputText value="#{list.cidade.nome}" />
+				</p:column>
+
+
+				<p:column headerText="Endereço">
+					<h:outputText value="#{list.rua}" />
+				</p:column>
+
+				<p:column headerText="Número">
+					<h:outputText value="#{list.numero}" />
+				</p:column>
+
+				<p:column headerText="Matricula">
+					<h:outputText value="#{list.matricula}" />
+				</p:column>
+
+				<p:column headerText="Celular">
+					<h:outputText value="#{list.celular}" />
+				</p:column>
+				
+				<p:column headerText="Foto">
+					<!-- exibe qualquer foto em qualquer formato -->
+					<!-- cache não deixa ficar armazenada em cache  -->
+					<p:graphicImage cache="false" height="50px;" width="50px;" url="http://localhost:8080/uploads/#{list.nome}.jpg"/>
+					
+					
+				</p:column>
+				
+
+				<p:column headerText="Opções">
+
+					<p:commandButton icon="ui-icon-trash" onclick="PF('dlgExluirAluno').show()" update=":formExcluirAluno:pnlExcluirAluni">
+							<f:setPropertyActionListener value="#{list}"
+							target="#{alunoMB.objAluno}" />
+					</p:commandButton>
+
+					<p:commandButton icon="ui-icon-pencil" onclick="PF('dlgEditarAluno').show()" update=":frmEditarAluno:pnlEditarAluno">
+							<f:setPropertyActionListener value="#{list}"
+							target="#{alunoMB.objAluno}" />
+
+					</p:commandButton>
+
+				</p:column>
+
+				<f:facet name="footer">
+					<!-- se ficar buscando os dados sem querer coloque um update no formulario e msg -->
+					<p:commandButton value="Novo" actionListener="#{alunoMB.criarNovoObjetoEstado()}"
+						oncomplete="PF('dlgNovoAluno').show();" />
+				</f:facet>
+
+			</p:dataTable>
+		</h:form>
+
+
+
+
+
+
+		<!--  formulario cadastrar Aluno -->
+
+		<p:dialog widgetVar="dlgNovoAluno" closable="false" draggable="true"
+			resizable="false" header="Cadastro de Alunos" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmNovoAluno" enctype="multipart/form-data">
+
+				<h:panelGrid id="pnlNovoAluno" columns="2">
+
+					<p:outputLabel for="txtNome" value="Nome" />
+					<h:inputText id="txtNome" size="30" maxlength="50" value="#{alunoMB.objAluno.nome}"  required="true" requiredMessage="Digite o valor do campo" converterMessage="digite apenas letras">
+						<f:convertNumber pattern="#aaaaa"/>/>
+					</h:inputText>
+					
+
+					<p:outputLabel for="txtEnd" value="Endereço" />
+					<h:inputText id="txtEnd" size="30" maxlength="50" value="#{alunoMB.objAluno.rua}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+					
+					<p:outputLabel value="Número" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.numero}"  required="true" requiredMessage="Digite o valor do campo" converterMessage="Digite apenas números">
+						<f:convertNumber pattern="#0.00"/>
+					</h:inputText>
+
+					<p:outputLabel value="Matricula" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.matricula}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Celular" />
+					<p:inputMask mask="9999-99-99" size="30" maxlength="50" value="#{alunoMB.objAluno.celular}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Cidade" />
+					<p:selectOneMenu value="#{alunoMB.objAluno.cidade}"  converter="converterCidade">
+
+						<f:selectItem itemValue="" itemLabel="Selecione uma Cidade" />
+						<f:selectItems value="#{alunoMB.listaCidade}" var="cid"
+						itemValue="#{cid}" itemLabel="#{cid.nome}"/>
+
+					</p:selectOneMenu>
+					
+					<p:outputLabel for="fott" value="Foto" />
+					<p:fileUpload id="fott" mode="advanced" fileUploadListener="#{alunoMB.upload}" 
+					update=":msgGlobal :frmNovoAluno:foto" auto="true">
+					
+					</p:fileUpload>
+					
+					
+					<p:outputLabel for="foto" value="Foto"/>
+					<p:graphicImage id="foto" value="#{imagemMB.foto}" height="200px;" width="290px;">
+						<f:param name="caminho" value="#{alunoMB.objAluno.caminho}"/>
+					</p:graphicImage>
+					
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Salvar" actionListener="#{alunoMB.inserirAluno()}" 
+					update=":msgGlobal :formLista:tabelaLista" 
+					oncomplete="verificar(xhr, status, args, 'dlgNovoAluno', 'tabelaListar');"/>
+				
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgNovoAluno').hide();">
+
+					</p:commandButton>
+					<!--  oncomplete="PF('dlgFabNovo').hide(); tabelaFabricante.clearFilters();"-->
+
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+		
+		
+		<!-- formulario Excluir luno -->
+		
+		<p:dialog widgetVar="dlgExluirAluno" closable="false" resizable="false" modal="true" draggable="false" header="Excluir Aluno" appendTo="@(body)">
+			<h:form id="formExcluirAluno">
+				<h:panelGrid id="pnlExcluirAluni" columns="2">
+						<p:outputLabel value="Código"/>
+						<h:inputText value="#{alunoMB.objAluno.id}" readonly="true"/>
+						
+						<p:outputLabel  value="Aluno"/>
+						<h:inputText value="#{alunoMB.objAluno.nome}" readonly="true"/>
+				</h:panelGrid>
+				<h:panelGrid columns="3">
+						<p:commandButton value="Excluir" actionListener="#{alunoMB.excluirAluno()}"
+						 oncomplete="PF('dlgExluirAluno').hide();" 
+						 update=":msgGlobal :formLista:tabelaLista :formExcluirAluno:pnlExcluirAluni"/>
+						<p:commandButton value="Cancelar" onclick="PF('dlgExluirAluno').hide()"/>
+				
+				
+				</h:panelGrid>
+			</h:form>
+		
+		</p:dialog>
+		
+		
+		
+		
+		
+		
+		<!--  formulario Editar Aluno -->
+
+		<p:dialog widgetVar="dlgEditarAluno" closable="false" draggable="false"
+			resizable="false" header="Editar Alunos" modal="true"
+			appendTo="@(body)">
+
+			<h:form id="frmEditarAluno">
+			<h:panelGrid id="pnlEditarAluno" columns="2">
+				
+				   
+					<h:outputLabel value="Foto" />
+					<p:graphicImage cache="false" height="50px;" width="50px;" url="http://localhost:8080/uploads/#{alunoMB.objAluno.nome}.jpg"/>
+					
+				
+					<p:outputLabel value="Nome" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.nome}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Endereço" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.rua}"  required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Número" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.numero}" required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Matricula" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.matricula}" required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Celular" />
+					<h:inputText size="30" maxlength="50" value="#{alunoMB.objAluno.celular}" required="true" requiredMessage="Digite o valor do campo"/>
+
+					<p:outputLabel value="Cidade" />
+					<p:selectOneMenu value="#{alunoMB.objAluno.cidade}"  converter="converterCidade">
+
+						<f:selectItem itemValue="" itemLabel="Selecione uma Cidade" />
+						<f:selectItems value="#{alunoMB.listaCidade}" var="cid"
+						itemValue="#{cid}" itemLabel="#{cid.nome}"/>
+
+					</p:selectOneMenu>
+					
+						<p:outputLabel for="fotoEd" value="Foto" />
+					<p:fileUpload id="fotoEd" mode="advanced" fileUploadListener="#{alunoMB.upload}" update=":msgGlobal :frmEditarAluno:fotoEdita" auto="true">
+					
+					</p:fileUpload>
+					
+					
+					<p:outputLabel for="fotoEdita" value="Foto"/>
+					<p:graphicImage id="fotoEdita" value="#{imagemMB.foto}" height="200px;" width="290px;">
+						<f:param name="caminho" value="#{alunoMB.objAluno.caminho}"/>
+					</p:graphicImage>
+					
+					
+					
+				</h:panelGrid>
+
+				<h:panelGrid columns="3">
+
+					<p:commandButton value="Salvar" actionListener="#{alunoMB.editarAluno()}" 
+					update=":msgGlobal :formLista:tabelaLista" 
+						oncomplete="verificar(xhr, status, args, 'dlgEditarAluno', 'tabelaListar');"/>
+				
+
+					<p:commandButton value="Cancelar" process="@this"
+						onclick="PF('dlgEditarAluno').hide();">
+
+					</p:commandButton>
+				
+				</h:panelGrid>
+			</h:form>
+
+		</p:dialog>
+
+
+
+	</ui:define>
+</ui:composition>
+
+</html>

@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
+
+<ui:composition template="/pages/template/modeloGeral.xhtml">
+	<ui:define name="metadata">
+		<f:event listener="#{estaboMB.carrega()}" type="preRenderView" />
+	</ui:define>
+
+	<ui:define name="conteudo">
+	
+
+		<h:form id="formTabela">
+		
+			<p:toolbar>
+				<f:facet name="left">
+					<h:outputText value="Estados" />
+				</f:facet>
+			</p:toolbar>
+			
+			<h:panelGrid columns="4" >
+				<p:outputLabel value="Descrição" />
+				<p:inputText maxlength="50" size="30" value="#{estaboMB.nome}"/>
+				<p:commandButton value="Buscar" actionListener="#{estaboMB.buscarPorNome()}" update=":formTabela :tabelaPesquisa"/>
+				<p:commandButton value="Novo"  action="/pages/estadoCadastro.xhtml?faces-redirect=true"/>
+			</h:panelGrid>
+			
+			
+			
+			<p:dataTable id="tabelaPesquisa" emptyMessage="Nenhum Registro Encontrado." value="#{estaboMB.listaEstado}"
+			filteredValue="#{estaboMB.listaEstado}" var="estadoL" rows="9" paginator="true" >
+				<p:column headerText="Código">
+					<h:outputText value="#{estadoL.id}" />
+				</p:column>
+
+				<p:column headerText="Estado" filterBy="#{estadoL.nome}" sortBy="#{estadoL.nome}">
+			<h:outputText value="#{estadoL.nome}" />
+		
+				</p:column>
+
+				<p:column headerText="Sigla">
+				
+			<h:outputText value="#{estadoL.sigla}" />
+				</p:column>
+				
+				<p:column headerText="Opções">
+					<p:button value="Excluir" outcome="/pages/estadoCadastro.xhtml?faces-redirect=true">
+						 <f:param name="codigoEstado" value="#{estadoL.id}"/> 
+						
+					</p:button> 
+					
+					<p:button value="Editar"  outcome="/pages/estadoCadastro.xhtml?faces-redirect=true">
+					 	<f:param name="codigoEstado" value="#{estadoL.id}"/> 
+						
+					</p:button>				
+				</p:column>
+
+			</p:dataTable>
+				
+		</h:form>
+
+
+	</ui:define>
+</ui:composition>
+
+</html>
